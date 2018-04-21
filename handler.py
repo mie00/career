@@ -50,7 +50,7 @@ def next(event, context):
 
 def autocomplete(event, context):
     q = (event["queryStringParameters"] or {}).get("q", "")
-    res = list(k for (l, k) in sorted((-tech[i], i) for i in tech if i.startswith(q)))
+    res = list((k, -l) for (l, k) in sorted((-tech[i], i) for i in tech if i.startswith(q)))
     response = {
         "statusCode": 200,
         "body": json.dumps(res[:10]),

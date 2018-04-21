@@ -7,27 +7,32 @@
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-4">
+        <div class="col-3">
 	  results
         </div>
-        <div class="col-4">
+        <div class="col-3">
 	  skills <input value="5" id="iconst" />
         </div>
-        <div class="col-4">
+        <div class="col-3">
 	  notinterested <input value="5" id="nconst" />
+        </div>
+        <div class="col-3">
+	  autocomplete <input id="autocomplete" />
         </div>
       </div>
       <div class="row">
-        <div id="results" class="col-4">
+        <div id="results" class="col-3">
         </div>
-        <div id="interested" class="col-4">
+        <div id="interested" class="col-3">
         </div>
-        <div id="notinterested" class="col-4">
+        <div id="notinterested" class="col-3">
+        </div>
+        <div id="autoc" class="col-3">
         </div>
       </div>
     </div>
     <script>
-var drake = dragula([document.querySelector('#results'), document.querySelector('#interested'), document.querySelector('#notinterested')], {
+var drake = dragula([document.querySelector('#results'), document.querySelector('#interested'), document.querySelector('#notinterested'), document.querySelector('#autoc')], {
   removeOnSpill: true,
 });
 var elem = function(x, score) {
@@ -52,11 +57,24 @@ var render = function() {
 		  + "&notinterested_const=" + nConst, true);
   xhttp.send();
 }
+var autocomplete = function() {
+  var q = document.getElementById("autocomplete").value
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("autoc").innerHTML = JSON.parse(this.responseText).map((x) => elem(x[0], x[1])).join('');
+    }
+  };
+  xhttp.open("GET", "https://phi6zt9yll.execute-api.us-west-2.amazonaws.com/dev/career/autocomplete?q=" + q, true);
+  xhttp.send();
+}
 render();
 drake.on('drop', render);
 drake.on('remove', render);
 document.getElementById("iconst").addEventListener('keyup', render);
 document.getElementById("nconst").addEventListener('keyup', render);
+
+document.getElementById("autocomplete").addEventListener('keyup', autocomplete);
 
     </script>
   </body>
