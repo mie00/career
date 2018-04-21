@@ -49,7 +49,7 @@ def next(event, context):
     return response
 
 def autocomplete(event, context):
-    q = (event["queryStringParameters"] or {}).get("q", "")
+    q = (event["queryStringParameters"] or {}).get("q", "").lower()
     res = list((k, -l) for (l, k) in sorted((-tech[i], i) for i in tech if i.startswith(q)))
     response = {
         "statusCode": 200,
