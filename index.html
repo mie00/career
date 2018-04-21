@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js'></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-4">
+	  results
+        </div>
+        <div class="col-4">
+	  skills <input value="5" id="iconst" />
+        </div>
+        <div class="col-4">
+	  notinterested <input value="5" id="nconst" />
+        </div>
+      </div>
+      <div class="row">
+        <div id="results" class="col-4">
+        </div>
+        <div id="interested" class="col-4">
+        </div>
+        <div id="notinterested" class="col-4">
+        </div>
+      </div>
+    </div>
+    <script>
+var drake = dragula([document.querySelector('#results'), document.querySelector('#interested'), document.querySelector('#notinterested')], {
+  removeOnSpill: true,
+});
+var elem = function(x, score) {
+	return '<button type="button" class="btn btn-primary d-block mt-1 rounded">' + x + ' <span class="badge badge-secondary">'+ Math.round(100 * score) / 100 + '</span></button>';
+}
+var getName = function(x) {
+	return x.childNodes[0].textContent.trim();
+}
+var render = function() {
+  var interested = Array.apply(null, document.getElementById("interested").children).map((x) => getName(x)).join(',');
+  var notinterested = Array.apply(null, document.getElementById("notinterested").children).map((x) => getName(x)).join(',');
+  var iConst = document.getElementById("iconst").value
+  var nConst = document.getElementById("nconst").value
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("results").innerHTML = JSON.parse(this.responseText).map((x) => elem(x[0], x[1])).join('');
+    }
+  };
+  xhttp.open("GET", "https://phi6zt9yll.execute-api.us-west-2.amazonaws.com/dev/career/next?skills="
+		  + interested + "&notinterested=" + notinterested + "&interested_const=" + iConst
+		  + "&notinterested_const=" + nConst, true);
+  xhttp.send();
+}
+render();
+drake.on('drop', render);
+drake.on('remove', render);
+document.getElementById("iconst").addEventListener('keyup', render);
+document.getElementById("nconst").addEventListener('keyup', render);
+
+    </script>
+  </body>
+</html>
+
