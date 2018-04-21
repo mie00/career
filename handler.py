@@ -1,5 +1,6 @@
 import json
 from functools import reduce
+from collections import Counter
 
 with open('sols') as f:
     sols = json.load(f)
@@ -9,11 +10,9 @@ def lower(x):
 
 res = [list(map(lower, i)) for j in sols['res'] for i in j]
 
+tech = Counter(i for j in res for i in j)
+
 def next(event, context):
-    body = {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "input": event["queryStringParameters"]
-    }
     q = event["queryStringParameters"] or {}
 
     interested = set(map(lower, q.get("skills", "").split(",")))
@@ -42,6 +41,19 @@ def next(event, context):
     response = {
         "statusCode": 200,
         "body": json.dumps(r[:10]),
+        "headers": {
+             "Access-Control-Allow-Origin": "*"
+        }
+    }
+
+    return response
+
+def autocomplete(event, context):
+    q = (event["queryStringParameters"] or {}).get("q", "")
+    res = list(k for (l, k) in sorted((-tech[i], i) for i in tech if i.startswith(q)))
+    response = {
+        "statusCode": 200,
+        "body": json.dumps(res[:10]),
         "headers": {
              "Access-Control-Allow-Origin": "*"
         }

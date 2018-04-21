@@ -10,3 +10,9 @@ functions:
       - http:
           path: career/next
           method: get
+  autocomplete:
+    handler: handler.autocomplete
+    events:
+      - http:
+          path: career/autocomplete
+          method: get
